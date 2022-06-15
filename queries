@@ -13,9 +13,37 @@ ORDER BY 1,2
 # Total Cases vs Total Deaths in NZ
 SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as Death_Percentage
 FROM `portfolioproject20220613.covid19_20220613.Covid_Deaths_20220613`
-WHERE location = 'New Zealand'
+WHERE location = 'United States'
 ORDER BY 1,2
 ;
+
+SELECT SUM(new_cases) as total_cases, SUM(new_deaths) as total_deaths, SUM(new_deaths)/SUM(new_cases)*100 as death_percentage
+FROM `portfolioproject20220613.covid19_20220613.Covid_Deaths_20220613`
+#WHERE location = 'United States'
+#WHERE location <> 'international'
+WHERE continent IS NOT NULL
+#AND location <> "International"
+#AND location <> "World"
+#AND location <> "Upper middle income"
+#AND location <> "High income"
+#AND location <> "Lower middle income"
+#AND location <> "Low income"
+#AND location <> "Asia"
+#AND location <> "Africa"
+#AND location <> "North America"
+#AND location <> "Oceania"
+#AND location <> "Europe"
+#AND location <> "European Union"
+;
+
+SELECT SUM(total_cases) as total_cases, SUM(total_deaths) as total_deaths, SUM(total_deaths)/SUM(total_cases)*100 as death_percentage
+FROM `portfolioproject20220613.covid19_20220613.Covid_Deaths_20220613`
+#WHERE location = 'United States'
+#WHERE location <> 'international'
+WHERE continent IS NOT NULL
+AND date = "2022-06-11"
+;
+
 
 # Total Cases vs Total Deaths in CN
 SELECT location, date, total_cases, total_deaths, (total_deaths/total_cases)*100 as Death_Percentage
@@ -74,6 +102,23 @@ AND location <> "Low income"
 GROUP BY location
 # ORDER BY continent
 ORDER BY max_deaths_count DESC
+;
+
+# INFECTION NUMBERS by DAY
+SELECT location, population, date, total_cases, total_cases/population*100 as infection_rate
+FROM `portfolioproject20220613.covid19_20220613.Covid_Deaths_20220613`
+WHERE continent IS NOT NULL AND date > "2020-12-31"
+#GROUP BY location, population, date
+#ORDER BY infection_rate DESC
+ORDER BY location, date
+;
+
+# INFECTION NUMBERS by DAY
+SELECT location, population, date, MAX(total_cases) as infection_count, MAX(total_cases)/population*100 as infection_rate
+FROM `portfolioproject20220613.covid19_20220613.Covid_Deaths_20220613`
+WHERE continent IS NOT NULL
+GROUP BY location, population, date
+ORDER BY location, date
 ;
 
 # GLOBAL NUMBERS by DAY
@@ -137,6 +182,16 @@ ON dea.location = vax.location
 WHERE dea.continent IS NOT NULL
 GROUP BY 1, 2
 ORDER BY dea.location
+;
+
+# Fully Vaxxed Percentage by Country by date
+SELECT dea.continent, dea.date, dea.location, MAX(dea.population) as population, vax.people_fully_vaccinated, people_fully_vaccinated/MAX(dea.population)*100 as percent_fully_vax
+FROM `portfolioproject20220613.covid19_20220613.Covid_Deaths_20220613` dea
+JOIN `portfolioproject20220613.covid19_20220613.Covid_Vax_20220613` vax
+ON dea.date = vax.date AND dea.location = vax.location
+WHERE dea.continent IS NOT NULL
+GROUP BY dea.continent, dea.date, dea.location, vax.people_fully_vaccinated
+ORDER BY dea.location, dea.date
 ;
 
 # Vax given rolling sum by Country
